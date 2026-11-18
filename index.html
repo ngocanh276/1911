@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A little something for you 💚</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Dancing+Script:wght@500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f7f1e5;
+    --paper: #fffdf7;
+    --green: #355b45;
+    --green-dark: #264433;
+    --sage: #9eae91;
+    --ink: #344237;
+    --muted: #768073;
+    --wax: #a85f52;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; cursor: pointer; }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .12;
+    z-index: 50;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E");
+  }
+
+  .intro {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 32px 18px;
+    position: relative;
+    background:
+      radial-gradient(circle at 20% 20%, #e7e8d7 0, transparent 32%),
+      radial-gradient(circle at 80% 80%, #f0dcd1 0, transparent 34%),
+      var(--cream);
+    transition: opacity .65s ease, transform .65s ease;
+  }
+  .intro.fade-out {
+    opacity: 0;
+    transform: translateY(-16px);
+    pointer-events: none;
+  }
+  .intro.hidden {
+    display: none;
+  }
+
+  .intro-inner {
+    text-align: center;
+    max-width: 620px;
+    position: relative;
+    z-index: 2;
+  }
+  .tiny-label {
+    font-size: 11px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  h1 {
+    font: 600 clamp(38px, 8vw, 68px)/1.08 'Lora', serif;
+    margin: 16px 0 12px;
+    color: var(--green);
+  }
+  .intro p {
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.75;
+    margin: 0 auto;
+    max-width: 430px;
+  }
+
+  .envelope-wrap {
+    width: min(330px, 84vw);
+    height: 230px;
+    margin: 44px auto 26px;
+    position: relative;
+    perspective: 1000px;
+    filter: drop-shadow(0 18px 22px rgba(67, 85, 59, 0.14));
+    cursor: pointer;
+    transition: transform .3s ease;
+  }
+  .envelope-wrap:hover {
+    transform: translateY(-3px);
+  }
+  .envelope {
+    position: absolute;
+    inset: 34px 0 0;
+    background: #ced8c3;
+    border-radius: 6px;
+    transform-style: preserve-3d;
+  }
+  .envelope::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background:
+      linear-gradient(145deg, transparent 49.5%, #c1cfb8 50%) left/50.2% 100% no-repeat,
+      linear-gradient(215deg, transparent 49.5%, #c1cfb8 50%) right/50.2% 100% no-repeat;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .envelope::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70%;
+    border-radius: 0 0 6px 6px;
+    background:
+      linear-gradient(34deg, #cbd6c1 49.5%, transparent 50%) left bottom/50.2% 100% no-repeat,
+      linear-gradient(-34deg, #d3ddca 49.5%, transparent 50%) right bottom/50.2% 100% no-repeat;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .letter-peek {
+    position: absolute;
+    left: 7%;
+    width: 86%;
+    height: 155px;
+    bottom: 16px;
+    background: var(--paper);
+    border: 1px solid #ebe4d5;
+    border-radius: 4px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
+    z-index: 2;
+    display: grid;
+    place-items: start center;
+    padding-top: 22px;
+    font: 600 26px 'Dancing Script', cursive;
+    color: var(--green);
+    transition: transform .85s cubic-bezier(0.22, 1, 0.36, 1) .25s, z-index 0s .25s;
+  }
+
+  .flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 62%;
+    background: #b7c7af;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transition: transform .65s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s .25s;
+    z-index: 5;
+  }
+
+  .seal {
+    position: absolute;
+    z-index: 6;
+    left: 50%;
+    top: 56%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #bc6d5f, var(--wax));
+    color: #f9e9d6;
+    display: grid;
+    place-items: center;
+    font: 600 19px 'Lora', serif;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    transition: opacity .25s ease, transform .25s ease;
+  }
+
+  .envelope-wrap.open .flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+  }
+  .envelope-wrap.open .letter-peek {
+    transform: translateY(-88px);
+    z-index: 3;
+  }
+  .envelope-wrap.open .seal {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    pointer-events: none;
+  }
+
+  .primary {
+    border: 0;
+    background: var(--green);
+    color: #fffdf7;
+    padding: 13px 28px;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: .02em;
+    box-shadow: 0 8px 18px rgba(53, 91, 69, 0.2);
+    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: var(--green-dark);
+    box-shadow: 0 10px 22px rgba(53, 91, 69, 0.28);
+  }
+  .primary:disabled {
+    opacity: 0.85;
+    cursor: default;
+  }
+
+  .hint {
+    font: 600 22px 'Dancing Script', cursive;
+    color: #848c77;
+    margin-top: 12px;
+  }
+
+  .scrapbook {
+    display: none;
+    padding: 64px 18px 88px;
+    max-width: 900px;
+    margin: auto;
+  }
+  .scrapbook.visible {
+    display: block;
+    animation: fadeUp .85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(26px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .topline {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+  .topline h2 {
+    font: 600 clamp(30px, 6vw, 48px)/1.15 'Lora', serif;
+    color: var(--green);
+    margin: 10px 0 8px;
+  }
+  .script {
+    font: 600 26px 'Dancing Script', cursive;
+    color: #9a7867;
+  }
+
+  .paper {
+    background: var(--paper);
+    padding: clamp(28px, 5vw, 56px);
+    border: 1px solid #e9e1d2;
+    box-shadow: 0 14px 36px rgba(75, 81, 53, 0.1);
+    position: relative;
+    transform: rotate(-.3deg);
+    border-radius: 3px;
+  }
+  .paper::before {
+    content: "";
+    position: absolute;
+    inset: 11px;
+    border: 1px dashed #d8d3c4;
+    pointer-events: none;
+  }
+  .tape {
+    position: absolute;
+    width: 96px;
+    height: 26px;
+    background: rgba(232, 217, 155, 0.65);
+    top: -13px;
+    left: calc(50% - 48px);
+    transform: rotate(-2.5deg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  .paper-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0 22px;
+    position: relative;
+    z-index: 2;
+  }
+  .letter-title {
+    font: 600 27px 'Lora', serif;
+    color: var(--green);
+    margin: 0;
+  }
+  .skip-btn {
+    background: rgba(53, 91, 69, 0.07);
+    border: 1px solid rgba(53, 91, 69, 0.18);
+    color: var(--green);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    transition: all .2s ease;
+    white-space: nowrap;
+  }
+  .skip-btn:hover {
+    background: var(--green);
+    color: #fffdf7;
+  }
+  .skip-btn.done {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .letter-copy {
+    font-size: 15.2px;
+    line-height: 1.95;
+    color: #495448;
+    position: relative;
+    z-index: 1;
+    min-height: 360px;
+  }
+  .letter-copy p {
+    margin: 0 0 18px;
+  }
+  .letter-copy p:last-child {
+    margin-bottom: 0;
+  }
+  .letter-sign {
+    font: 700 28px 'Dancing Script', cursive;
+    color: var(--green);
+    margin-top: 8px;
+  }
+
+  .writing-pen {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    width: 0;
+    height: 1em;
+    vertical-align: baseline;
+    pointer-events: none;
+  }
+  .writing-pen svg {
+    position: absolute;
+    left: 1px;
+    bottom: 2px;
+    width: 26px;
+    height: 26px;
+    filter: drop-shadow(1px 3px 3px rgba(53, 91, 69, 0.25));
+    transform-origin: bottom left;
+    animation: penWiggle 0.28s infinite alternate ease-in-out;
+  }
+  @keyframes penWiggle {
+    0% { transform: rotate(-6deg) translateY(0px); }
+    100% { transform: rotate(4deg) translateY(-2px); }
+  }
+
+  .memories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin: 64px 0 56px;
+  }
+  .polaroid {
+    background: #fffefa;
+    padding: 12px 12px 34px;
+    box-shadow: 0 10px 24px rgba(52, 60, 43, 0.12);
+    transform: rotate(var(--r));
+    transition: transform .3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow .3s ease;
+    border: 1px solid #f0eadc;
+  }
+  .polaroid:hover {
+    transform: rotate(0deg) translateY(-7px);
+    box-shadow: 0 16px 30px rgba(52, 60, 43, 0.16);
+    z-index: 5;
+  }
+  .photo-placeholder {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #e4e9dc, #f0e4d9);
+    display: grid;
+    place-items: center;
+    color: #7c8d77;
+    font-size: 34px;
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .photo-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .polaroid p {
+    text-align: center;
+    font: 600 22px 'Dancing Script', cursive;
+    color: #5e6c57;
+    margin: 14px 0 0;
+  }
+
+  .sticker-note {
+    max-width: 580px;
+    margin: 52px auto;
+    text-align: center;
+    position: relative;
+    padding: 30px 24px;
+    background: #f2e7c6;
+    transform: rotate(1deg);
+    box-shadow: 0 8px 20px rgba(52, 60, 43, 0.08);
+  }
+  .sticker-note::before {
+    content: "";
+    position: absolute;
+    top: -11px;
+    left: calc(50% - 40px);
+    width: 80px;
+    height: 22px;
+    background: rgba(214, 184, 165, 0.7);
+    transform: rotate(-2deg);
+  }
+  .sticker-note p {
+    font: 600 26px/1.4 'Dancing Script', cursive;
+    color: #55634c;
+    margin: 0;
+  }
+
+  .ending {
+    text-align: center;
+    padding: 16px 10px 10px;
+  }
+  .heart {
+    font-size: 24px;
+    color: #b76d61;
+    margin-bottom: 10px;
+  }
+  .ending p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.85;
+    margin: 0 0 10px;
+  }
+
+  .replay-wrap {
+    margin-top: 28px;
+  }
+  .secondary-btn {
+    background: transparent;
+    border: 1px solid #c5ccb9;
+    color: var(--muted);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    transition: all .2s ease;
+  }
+  .secondary-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(53, 91, 69, 0.04);
+  }
+
+  .footer {
+    margin-top: 50px;
+    text-align: center;
+    color: #9a9d8e;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .floating {
+    position: absolute;
+    font: 600 26px 'Dancing Script', cursive;
+    color: #9b9e87;
+    opacity: .75;
+    pointer-events: none;
+  }
+  .f1 { top: 14%; left: 9%; transform: rotate(-12deg); }
+  .f2 { right: 8%; bottom: 16%; transform: rotate(9deg); }
+
+  @media (max-width: 680px) {
+    .memories {
+      grid-template-columns: 1fr;
+      max-width: 270px;
+      margin: 46px auto;
+      gap: 26px;
+    }
+    .polaroid:nth-child(1) { transform: rotate(-2deg); }
+    .polaroid:nth-child(2) { transform: rotate(2.5deg); }
+    .polaroid:nth-child(3) { transform: rotate(-1.5deg); }
+    .paper { padding: 26px 20px; }
+    .letter-copy { font-size: 14.5px; line-height: 1.88; }
+    .f1, .f2 { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<section class="intro" id="intro">
+  <span class="floating f1">for the boys ✿</span>
+  <span class="floating f2">a little memory...</span>
+  <div class="intro-inner">
+    <div class="tiny-label">19 November · International Men's Day</div>
+    <h1>A little<br>something for you.</h1>
+    <p>Một chiếc thiệp nhỏ dành cho những người bạn đặc biệt.<br>Open it when you're ready ♡</p>
+
+    <div class="envelope-wrap" id="envelope" role="button" tabindex="0" aria-label="Mở phong bì thư">
+      <div class="envelope">
+        <div class="letter-peek">just for you ♡</div>
+        <div class="flap"></div>
+        <div class="seal">A</div>
+      </div>
+    </div>
+
+    <button class="primary" id="openBtn">Open your letter ↗</button>
+    <div class="hint">psst... có điều muốn nói với chúng m</div>
+  </div>
+</section>
+
+<main class="scrapbook" id="scrapbook">
+  <header class="topline">
+    <div class="tiny-label">a page from our little scrapbook</div>
+    <h2>To the boys, with love.</h2>
+    <div class="script">some words, just because ♡</div>
+  </header>
+
+  <section class="paper">
+    <div class="tape"></div>
+    <div class="paper-header">
+      <h3 class="letter-title" id="salutation">Dear chúng m,</h3>
+      <button class="skip-btn" id="skipBtn" type="button">Hiện toàn bộ thư ⤵</button>
+    </div>
+    <div class="letter-copy" id="letterBody"></div>
+  </section>
+
+  <section class="memories" aria-label="Scrapbook photo memories">
+    <div class="polaroid" style="--r:-3.5deg">
+      <div class="photo-placeholder">
+        <span>✿</span>
+      </div>
+      <p>the good old days</p>
+    </div>
+    <div class="polaroid" style="--r:2deg">
+      <div class="photo-placeholder">
+        <span>☼</span>
+      </div>
+      <p>little moments, big memories</p>
+    </div>
+    <div class="polaroid" style="--r:-2deg">
+      <div class="photo-placeholder">
+        <span>♡</span>
+      </div>
+      <p>glad we crossed paths</p>
+    </div>
+  </section>
+
+  <aside class="sticker-note">
+    <p>“Here's to growing up,<br>but never losing the good parts of ourselves.”</p>
+  </aside>
+
+  <section class="ending">
+    <div class="heart">♥</div>
+    <p>Chúc chúng m có một ngày 19/11 thật vui.<br>Keep going, keep growing. 💚</p>
+    <div class="script">with lots of love, always ♡</div>
+
+    <div class="replay-wrap">
+      <button class="secondary-btn" id="closeBtn">↺ Gấp lại phong bì</button>
+    </div>
+  </section>
+
+  <div class="footer">made with love · 19.11</div>
+</main>
+
+<script>
+  const intro = document.getElementById('intro');
+  const openBtn = document.getElementById('openBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const skipBtn = document.getElementById('skipBtn');
+  const envelope = document.getElementById('envelope');
+  const scrapbook = document.getElementById('scrapbook');
+  const salutation = document.getElementById('salutation');
+  const letterBody = document.getElementById('letterBody');
+
+  const paragraphs = [
+    "Nhân ngày 19/11, chúc chúng m luôn có đủ bản lĩnh để theo đuổi những điều mình thích, đủ kiên trì để không bỏ cuộc giữa chừng và cũng đừng quên dành cho bản thân một chút dịu dàng trên hành trình trưởng thành nhé.",
+    "Mong rằng dù phía trước có bận rộn với chuyện học hành, công việc hay đôi khi là cả những áp lực, chúng m vẫn luôn giữ được sự nhiệt tình, ham học hỏi và một chút tò mò với thế giới xung quanh. Đừng ngại thử những điều mới, đi những con đường khác và cho bản thân cơ hội trải nghiệm thật nhiều nhé!",
+    "Chúc chúng m không chỉ đạt được những mục tiêu mà mình đang hướng tới, mà còn có thật nhiều niềm vui trên hành trình ấy. Mong mỗi đứa đều sẽ trở thành phiên bản mà mình mong muốn, nhưng vẫn luôn giữ được sự tử tế, chân thành và những điều đáng quý của riêng mình.",
+    "Sau này, khi nhìn lại những năm tháng đại học, hy vọng chúng m sẽ có thật nhiều chuyện vui để kể, thật nhiều kỷ niệm để nhớ và thật nhiều người để cảm thấy may mắn vì đã gặp được.",
+    "T cũng mong một ngày không xa, chúng m sẽ đồng hành cùng nhau ở một nơi nào đó, với tư cách là những người đồng nghiệp, chắc chắn là Big4 rồi. Chúc cho những nỗ lực hiện tại của mỗi đứa đều sẽ có một cái kết thật xứng đáng!",
+    "Chúc chúng m có một ngày 19/11 thật vui và luôn vững vàng trên con đường mình chọn. Chúc riêng Hưng sẽ có một đêm chung kết thật đáng nhớ, chúc m sẽ đạt được ước nguyện của mình. Nhớ là đừng chỉ mải mê chạy về phía trước mà quên tận hưởng những ngày tháng hiện tại nữa nhé!",
+    "Nganh,"
+  ];
+
+  const penElement = document.createElement('span');
+  penElement.className = 'writing-pen';
+  penElement.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 21L4.5 16.5L17.2 3.8C18.1 2.9 19.6 2.9 20.5 3.8C21.4 4.7 21.4 6.2 20.5 7.1L7.8 19.8L3 21Z" fill="#355b45" stroke="#264433" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M15.5 5.5L18.8 8.8" stroke="#f1df9e" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M3 21L6.2 19.8L4.5 18.1L3 21Z" fill="#f1df9e"/>
+    </svg>
+  `;
+
+  const params = new URLSearchParams(window.location.search);
+  const recipient = params.get('to');
+  if (recipient && recipient.trim() !== '') {
+    salutation.textContent = `Dear ${recipient.trim()},`;
+  }
+
+  let isOpening = false;
+  let typingTimer = null;
+
+  function renderFullLetterImmediately() {
+    if (typingTimer) {
+      clearTimeout(typingTimer);
+      typingTimer = null;
+    }
+    letterBody.innerHTML = '';
+    paragraphs.forEach((text, index) => {
+      const p = document.createElement('p');
+      if (index === paragraphs.length - 1) {
+        p.className = 'letter-sign';
+      }
+      p.textContent = text;
+      letterBody.appendChild(p);
+    });
+    skipBtn.classList.add('done');
+  }
+
+  function startWritingAnimation() {
+    if (typingTimer) clearTimeout(typingTimer);
+    letterBody.innerHTML = '';
+    skipBtn.classList.remove('done');
+
+    let pIndex = 0;
+    let charIndex = 0;
+    let currentP = null;
+
+    function typeNextChar() {
+      if (pIndex >= paragraphs.length) {
+        if (penElement.parentNode) {
+          penElement.parentNode.removeChild(penElement);
+        }
+        skipBtn.classList.add('done');
+        return;
+      }
+
+      if (charIndex === 0) {
+        currentP = document.createElement('p');
+        if (pIndex === paragraphs.length - 1) {
+          currentP.className = 'letter-sign';
+        }
+        letterBody.appendChild(currentP);
+      }
+
+      const fullText = paragraphs[pIndex];
+      charIndex++;
+      currentP.textContent = fullText.slice(0, charIndex);
+      currentP.appendChild(penElement);
+
+      if (charIndex < fullText.length) {
+        const lastChar = fullText[charIndex - 1];
+        let delay = 22;
+        if (lastChar === ',' || lastChar === ';') delay = 140;
+        else if (lastChar === '.' || lastChar === '!') delay = 260;
+
+        typingTimer = setTimeout(typeNextChar, delay);
+      } else {
+        pIndex++;
+        charIndex = 0;
+        typingTimer = setTimeout(typeNextChar, 320);
+      }
+    }
+
+    typeNextChar();
+  }
+
+  function openLetter() {
+    if (isOpening) return;
+    isOpening = true;
+
+    envelope.classList.add('open');
+    openBtn.textContent = 'Opening your letter...';
+    openBtn.disabled = true;
+
+    setTimeout(() => {
+      intro.classList.add('fade-out');
+    }, 850);
+
+    setTimeout(() => {
+      intro.classList.add('hidden');
+      scrapbook.classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      isOpening = false;
+      startWritingAnimation();
+    }, 1450);
+  }
+
+  function closeLetter() {
+    if (typingTimer) clearTimeout(typingTimer);
+    scrapbook.classList.remove('visible');
+    intro.classList.remove('hidden');
+    void intro.offsetWidth;
+    intro.classList.remove('fade-out');
+
+    envelope.classList.remove('open');
+    openBtn.textContent = 'Open your letter ↗';
+    openBtn.disabled = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  openBtn.addEventListener('click', openLetter);
+  envelope.addEventListener('click', openLetter);
+  envelope.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openLetter();
+    }
+  });
+  skipBtn.addEventListener('click', renderFullLetterImmediately);
+  closeBtn.addEventListener('click', closeLetter);
+</script>
+</body>
+</html>
