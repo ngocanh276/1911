@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>19.11 · A Little Keepsake For You 🍀</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-cream: #f4efe6;
+    --bg-warm: #ebe3d5;
+    --paper: #fffdf8;
+    --green-deep: #243e2f;
+    --green-main: #355b45;
+    --sage: #8da185;
+    --sage-light: #dce3d5;
+    --gold: #c5a059;
+    --gold-light: #e8d5a7;
+    --wax-red: #9e473b;
+    --ink: #2c3830;
+    --muted: #6e7a70;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--bg-cream);
+    background-image:
+      radial-gradient(at 15% 15%, rgba(158, 174, 145, 0.22) 0px, transparent 45%),
+      radial-gradient(at 85% 80%, rgba(214, 184, 165, 0.25) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(255, 253, 248, 0.6) 0px, transparent 80%);
+    color: var(--ink);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    overflow-x: hidden;
+    min-height: 100svh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Lớp vân giấy mỹ thuật */
+  .paper-grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.16;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.3'/%3E%3C/svg%3E");
+  }
+
+  /* Canvas hiệu ứng bụi vàng & lá bay */
+  #fx-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 90;
+  }
+
+  /* Nút bật/tắt hộp nhạc */
+  .music-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 80;
+    background: rgba(255, 253, 248, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(53, 91, 69, 0.2);
+    color: var(--green-main);
+    padding: 8px 15px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(36, 62, 47, 0.08);
+    transition: all 0.3s ease;
+  }
+  .music-toggle:hover {
+    transform: translateY(-2px);
+    background: #fff;
+    border-color: var(--green-main);
+  }
+  .sound-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 12px;
+  }
+  .sound-bars span {
+    width: 2.5px;
+    height: 4px;
+    background: var(--green-main);
+    border-radius: 2px;
+    transition: height 0.2s ease;
+  }
+  .music-toggle.playing .sound-bars span {
+    animation: eq 0.8s infinite ease-in-out alternate;
+  }
+  .music-toggle.playing .sound-bars span:nth-child(2) { animation-delay: 0.2s; }
+  .music-toggle.playing .sound-bars span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes eq {
+    0% { height: 3px; }
+    100% { height: 12px; }
+  }
+
+  /* =========================================
+     MÀN 1: BÌA THIỆP & DẤU SÁP 3D
+     ========================================= */
+  .cover-stage {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    position: relative;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .cover-stage.hide {
+    opacity: 0;
+    transform: scale(1.04) translateY(-20px);
+    pointer-events: none;
+  }
+  .cover-stage.gone {
+    display: none;
+  }
+
+  .top-badge {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 7.5vw, 72px);
+    font-weight: 600;
+    line-height: 1.05;
+    color: var(--green-deep);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--green-main);
+    font-weight: 500;
+  }
+
+  .hero-sub {
+    font-size: 14.5px;
+    color: var(--muted);
+    text-align: center;
+    max-width: 420px;
+    line-height: 1.7;
+    margin-bottom: 38px;
+  }
+
+  /* Phong bì sang trọng */
+  .luxury-envelope {
+    width: min(360px, 88vw);
+    height: 235px;
+    position: relative;
+    perspective: 1200px;
+    cursor: pointer;
+    margin-bottom: 32px;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .luxury-envelope:hover {
+    transform: translateY(-6px) rotate(-0.8deg);
+  }
+
+  .env-body {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #dce3d4, #c6d2bc);
+    border-radius: 10px;
+    box-shadow:
+      0 25px 45px -12px rgba(36, 62, 47, 0.22),
+      0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    transform-style: preserve-3d;
+  }
+
+  .env-body::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(197, 160, 89, 0.45);
+    border-radius: 6px;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .env-card {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    bottom: 14px;
+    height: 190px;
+    background: var(--paper);
+    border-radius: 6px;
+    padding: 22px 18px;
+    text-align: center;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.06);
+    border: 1px solid #ebe3d3;
+    z-index: 2;
+    transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+  }
+  .env-card-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 28px;
+    color: var(--green-main);
+    margin-bottom: 4px;
+  }
+  .env-card-sub {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .env-pocket {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border-radius: 10px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .env-pocket::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(146deg, transparent 49.6%, #becbb3 50%) left/50.2% 100% no-repeat,
+      linear-gradient(214deg, transparent 49.6%, #becbb3 50%) right/50.2% 100% no-repeat;
+  }
+  .env-pocket::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 68%;
+    background:
+      linear-gradient(33deg, #cad6bf 49.6%, transparent 50%) left bottom/50.2% 100% no-repeat,
+      linear-gradient(-33deg, #d2dec8 49.6%, transparent 50%) right bottom/50.2% 100% no-repeat;
+  }
+
+  .env-flap {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 62%;
+    background: linear-gradient(180deg, #b3c3a8, #c2d0b8);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s 0.25s;
+    z-index: 5;
+  }
+
+  .wax-seal {
+    position: absolute;
+    top: 56%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #c46254, var(--wax) 65%, #752e24 100%);
+    box-shadow:
+      0 8px 18px rgba(117, 46, 36, 0.35),
+      inset 0 2px 4px rgba(255, 255, 255, 0.35),
+      inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+    z-index: 6;
+    display: grid;
+    place-items: center;
+    transition: all 0.4s ease;
+    animation: pulseSeal 2.6s infinite ease-in-out;
+  }
+  .wax-seal::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(245, 223, 187, 0.55);
+  }
+  .wax-seal span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #f7e6c8;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  @keyframes pulseSeal {
+    0%, 100% { box-shadow: 0 8px 18px rgba(117, 46, 36, 0.35), 0 0 0 0 rgba(197, 160, 89, 0.4); }
+    50% { box-shadow: 0 8px 22px rgba(117, 46, 36, 0.45), 0 0 0 10px rgba(197, 160, 89, 0); }
+  }
+
+  .luxury-envelope.is-open .env-flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+  }
+  .luxury-envelope.is-open .env-card {
+    transform: translateY(-105px);
+    z-index: 4;
+  }
+  .luxury-envelope.is-open .wax-seal {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.35);
+    pointer-events: none;
+  }
+
+  .cta-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-main);
+    color: #fffdf8;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(36, 62, 47, 0.22);
+    transition: all 0.25s ease;
+  }
+  .cta-hint:hover {
+    background: var(--green-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(36, 62, 47, 0.3);
+  }
+
+  /* =========================================
+     MÀN 2: BÀN SCRAPBOOK CHI TIẾT
+     ========================================= */
+  .scrapbook-world {
+    display: none;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 76px 20px 100px;
+  }
+  .scrapbook-world.active {
+    display: block;
+    animation: revealWorld 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes revealWorld {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .editorial-header {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+  .editorial-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 600;
+    color: var(--green-deep);
+    margin: 8px 0;
+  }
+  .editorial-header .hand-sub {
+    font-family: 'Dancing Script', cursive;
+    font-size: 28px;
+    color: #8f7261;
+  }
+
+  .letter-sheet {
+    position: relative;
+    background-color: var(--paper);
+    background-image: linear-gradient(to bottom, transparent 35px, rgba(141, 161, 133, 0.16) 36px);
+    background-size: 100% 36px;
+    padding: clamp(34px, 6vw, 68px);
+    border-radius: 4px;
+    border: 1px solid #e6decb;
+    box-shadow:
+      0 20px 50px rgba(36, 62, 47, 0.09),
+      0 2px 6px rgba(0, 0, 0, 0.03);
+    transform: rotate(-0.25deg);
+    margin-bottom: 72px;
+  }
+
+  .washi-tape {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 130px;
+    height: 30px;
+    background: rgba(158, 174, 145, 0.45);
+    backdrop-filter: blur(2px);
+    border-left: 2px dotted rgba(255,255,255,0.6);
+    border-right: 2px dotted rgba(255,255,255,0.6);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+
+  .vintage-stamp {
+    position: absolute;
+    top: 26px;
+    right: 28px;
+    width: 74px;
+    height: 88px;
+    background: #f4ede0;
+    border: 2px dashed #b9c4b0;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(4deg);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    user-select: none;
+  }
+  .vintage-stamp .clover-icon {
+    font-size: 24px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .vintage-stamp span {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--green-main);
+    text-transform: uppercase;
+  }
+  .postmark {
+    position: absolute;
+    top: 44px;
+    right: 76px;
+    width: 68px;
+    height: 68px;
+    border: 1.5px solid rgba(158, 71, 59, 0.35);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: rgba(158, 71, 59, 0.45);
+    transform: rotate(-16deg);
+    pointer-events: none;
+  }
+
+  .sheet-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding-right: 95px;
+  }
+  .salutation {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 600;
+    color: var(--green-deep);
+  }
+  .instant-btn {
+    background: rgba(53, 91, 69, 0.08);
+    border: 1px solid rgba(53, 91, 69, 0.2);
+    color: var(--green-main);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .instant-btn:hover {
+    background: var(--green-main);
+    color: #fff;
+  }
+  .instant-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .letter-content {
+    font-size: 15.5px;
+    line-height: 36px;
+    color: #36423a;
+    min-height: 360px;
+  }
+  .letter-content p {
+    margin-bottom: 18px;
+  }
+  .ink-char {
+    display: inline;
+    animation: inkFade 0.35s ease forwards;
+  }
+  @keyframes inkFade {
+    from { opacity: 0; filter: blur(1.5px); }
+    to { opacity: 1; filter: blur(0); }
+  }
+
+  .signature-line {
+    font-family: 'Dancing Script', cursive;
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--green-main);
+    margin-top: 14px;
+  }
+
+  .fountain-pen {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 1em;
+    vertical-align: baseline;
+  }
+  .fountain-pen svg {
+    position: absolute;
+    left: 2px;
+    bottom: 4px;
+    width: 30px;
+    height: 30px;
+    filter: drop-shadow(2px 4px 4px rgba(36, 62, 47, 0.25));
+    transform-origin: bottom left;
+    animation: penGlide 0.26s infinite alternate ease-in-out;
+  }
+  @keyframes penGlide {
+    0% { transform: rotate(-8deg) translate(0, 0); }
+    100% { transform: rotate(3deg) translate(1px, -3px); }
+  }
+
+  .pressed-clover {
+    position: absolute;
+    bottom: 22px;
+    right: 30px;
+    font-size: 28px;
+    opacity: 0.75;
+    transform: rotate(18deg);
+    filter: sepia(0.2);
+    user-select: none;
+  }
+
+  .gallery-section {
+    margin: 70px 0;
+  }
+  .gallery-caption {
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 27px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+  .polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .polaroid-card {
+    background: #fffefa;
+    padding: 14px 14px 38px;
+    border-radius: 3px;
+    box-shadow: 0 12px 28px rgba(36, 62, 47, 0.12);
+    border: 1px solid #ece4d5;
+    transform: rotate(var(--angle));
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .polaroid-card::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(var(--tape-rot, 2deg));
+    width: 72px;
+    height: 20px;
+    background: rgba(232, 213, 167, 0.65);
+  }
+  .polaroid-card:hover {
+    transform: rotate(0deg) translateY(-10px) scale(1.03);
+    box-shadow: 0 22px 40px rgba(36, 62, 47, 0.18);
+    z-index: 10;
+  }
+  .polaroid-frame {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, #e3eadc, #efe3d8);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .polaroid-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .polaroid-art {
+    text-align: center;
+    color: var(--green-main);
+  }
+  .polaroid-art .big-sym {
+    font-size: 38px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .polaroid-art small {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .polaroid-text {
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 23px;
+    color: #4f5e52;
+    margin-top: 14px;
+  }
+
+  .quote-card {
+    max-width: 600px;
+    margin: 64px auto;
+    background: linear-gradient(135deg, #f3e8c8, #ede0ba);
+    padding: 34px 28px;
+    text-align: center;
+    position: relative;
+    transform: rotate(1.1deg);
+    box-shadow: 0 12px 28px rgba(36, 62, 47, 0.09);
+    border-radius: 2px;
+  }
+  .quote-card::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 90px;
+    height: 24px;
+    background: rgba(158, 71, 59, 0.25);
+  }
+  .quote-card p {
+    font-family: 'Dancing Script', cursive;
+    font-size: 28px;
+    line-height: 1.4;
+    color: #455243;
+  }
+
+  .closing-box {
+    text-align: center;
+    padding: 20px 10px 10px;
+  }
+  .closing-box p {
+    color: var(--muted);
+    font-size: 15.5px;
+    line-height: 1.85;
+    margin-bottom: 12px;
+  }
+  .closing-sign {
+    font-family: 'Dancing Script', cursive;
+    font-size: 29px;
+    color: #967362;
+    margin-bottom: 28px;
+  }
+
+  .action-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .celebrate-btn {
+    background: linear-gradient(135deg, var(--green-main), var(--green-deep));
+    color: #fffdf8;
+    border: none;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(36, 62, 47, 0.22);
+    transition: all 0.25s ease;
+  }
+  .celebrate-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 26px rgba(36, 62, 47, 0.3);
+  }
+
+  .fold-btn {
+    background: transparent;
+    border: 1px solid #bfc8b6;
+    color: var(--muted);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .fold-btn:hover {
+    border-color: var(--green-main);
+    color: var(--green-main);
+    background: rgba(53, 91, 69, 0.05);
+  }
+
+  .toast-wish {
+    margin-top: 18px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 25px;
+    color: var(--green-main);
+    min-height: 34px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.4s ease;
+  }
+  .toast-wish.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .footer-mark {
+    margin-top: 56px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #949d90;
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 42, 33, 0.72);
+    backdrop-filter: blur(6px);
+    z-index: 120;
+    display: none;
+    place-items: center;
+    padding: 20px;
+  }
+  .lightbox.open {
+    display: grid;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .lightbox-inner {
+    background: #fffefa;
+    padding: 18px 18px 42px;
+    border-radius: 4px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+  }
+  .lightbox-inner .lb-box {
+    aspect-ratio: 1/1;
+    background: linear-gradient(135deg, #e3eadc, #efe3d8);
+    display: grid;
+    place-items: center;
+    font-size: 54px;
+    color: var(--green-main);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .lightbox-inner .lb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .lightbox-inner p {
+    font-family: 'Dancing Script', cursive;
+    font-size: 28px;
+    color: var(--green-deep);
+  }
+
+  @media (max-width: 720px) {
+    .polaroid-grid {
+      grid-template-columns: 1fr;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    .vintage-stamp {
+      width: 58px;
+      height: 70px;
+      top: 18px;
+      right: 18px;
+    }
+    .postmark { display: none; }
+    .sheet-top {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-right: 68px;
+    }
+    .letter-sheet {
+      padding: 32px 22px;
+      background-size: 100% 34px;
+    }
+    .letter-content {
+      font-size: 14.8px;
+      line-height: 34px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="paper-grain"></div>
+<canvas id="fx-canvas"></canvas>
+
+<button class="music-toggle" id="musicBtn" type="button" aria-label="Bật tắt nhạc nền">
+  <div class="sound-bars"><span></span><span></span><span></span></div>
+  <span id="musicLabel">Music: Off</span>
+</button>
+
+<section class="cover-stage" id="coverStage">
+  <div class="top-badge">19 November · International Men's Day</div>
+  <h1 class="hero-title">A little <em>keepsake</em><br>for the boys.</h1>
+  <p class="hero-sub">Một chiếc thiệp nhỏ gói ghém vài lời nhắn gửi nhân ngày 19/11.<br>Chạm vào con dấu sáp để mở thư nhé 🍀</p>
+
+  <div class="luxury-envelope" id="envelope" role="button" tabindex="0" aria-label="Mở phong bì">
+    <div class="env-body">
+      <div class="env-card">
+        <div class="env-card-title">Just for you ♡</div>
+        <div class="env-card-sub">19 · 11 · 2026</div>
+      </div>
+      <div class="env-pocket"></div>
+      <div class="env-flap"></div>
+      <div class="wax-seal"><span>N</span></div>
+    </div>
+  </div>
+
+  <button class="cta-hint" id="openBtn" type="button">Bóc tem mở thư ✦</button>
+</section>
+
+<main class="scrapbook-world" id="scrapbookWorld">
+  <header class="editorial-header">
+    <div class="top-badge">a page from our little scrapbook</div>
+    <h2>To the boys, with love.</h2>
+    <div class="hand-sub">some words, just because ♡</div>
+  </header>
+
+  <article class="letter-sheet">
+    <div class="washi-tape"></div>
+    <div class="postmark">HANOI<br>19.11.26</div>
+    <div class="vintage-stamp">
+      <span class="clover-icon">🍀</span>
+      <span>19 · NOV</span>
+    </div>
+
+    <div class="sheet-top">
+      <h3 class="salutation" id="salutation">Dear chúng m,</h3>
+      <button class="instant-btn" id="instantBtn" type="button">Hiện toàn bộ thư ⤵</button>
+    </div>
+
+    <div class="letter-content" id="letterContent"></div>
+    <div class="pressed-clover" title="Good luck charm 🍀">🍀</div>
+  </article>
+
+  <section class="gallery-section">
+    <div class="gallery-caption">✦ bấm vào từng khung ảnh để xem nhé ✦</div>
+    <div class="polaroid-grid">
+      <div class="polaroid-card" style="--angle:-3deg; --tape-rot:-4deg" data-caption="the good old days ✿" data-symbol="✿">
+        <div class="polaroid-frame">
+          <div class="polaroid-art">
+            <span class="big-sym">✿</span>
+            <small>chapter 01</small>
+          </div>
+        </div>
+        <div class="polaroid-text">the good old days</div>
+      </div>
+
+      <div class="polaroid-card" style="--angle:2.2deg; --tape-rot:3deg" data-caption="little moments, big memories ☼" data-symbol="☼">
+        <div class="polaroid-frame">
+          <div class="polaroid-art">
+            <span class="big-sym">☼</span>
+            <small>chapter 02</small>
+          </div>
+        </div>
+        <div class="polaroid-text">little moments, big memories</div>
+      </div>
+
+      <div class="polaroid-card" style="--angle:-1.8deg; --tape-rot:-2deg" data-caption="glad we crossed paths ♡" data-symbol="♡">
+        <div class="polaroid-frame">
+          <div class="polaroid-art">
+            <span class="big-sym">♡</span>
+            <small>chapter 03</small>
+          </div>
+        </div>
+        <div class="polaroid-text">glad we crossed paths</div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="quote-card">
+    <p>“Here's to growing up,<br>but never losing the good parts of ourselves.”</p>
+  </aside>
+
+  <section class="closing-box">
+    <p>Chúc chúng m có một ngày 19/11 thật vui.<br>Keep going, keep growing. 💚</p>
+    <div class="closing-sign">with lots of love, always ♡</div>
+
+    <div class="action-row">
+      <button class="celebrate-btn" id="celebrateBtn" type="button">🍀 Gửi lời chúc may mắn</button>
+      <button class="fold-btn" id="foldBtn" type="button">↺ Gấp lại phong bì</button>
+    </div>
+    <div class="toast-wish" id="toastWish">Chúc chúng m rực rỡ theo cách riêng của mình! ✨</div>
+  </section>
+
+  <footer class="footer-mark">crafted with love by Nganh · 19.11</footer>
+</main>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <div class="lb-box" id="lbContent">✿</div>
+    <p id="lbCaption">the good old days</p>
+  </div>
+</div>
+
+<script>
+  const letterParagraphs = [
+    "Nhân ngày 19/11, chúc chúng m luôn có đủ bản lĩnh để theo đuổi những điều mình thích, đủ kiên trì để không bỏ cuộc giữa chừng và cũng đừng quên dành cho bản thân một chút dịu dàng trên hành trình trưởng thành nhé.",
+    "Mong rằng dù phía trước có bận rộn với chuyện học hành, công việc hay đôi khi là cả những áp lực, chúng m vẫn luôn giữ được sự nhiệt tình, ham học hỏi và một chút tò mò với thế giới xung quanh. Đừng ngại thử những điều mới, đi những con đường khác và cho bản thân cơ hội trải nghiệm thật nhiều nhé!",
+    "Chúc chúng m không chỉ đạt được những mục tiêu mà mình đang hướng tới, mà còn có thật nhiều niềm vui trên hành trình ấy. Mong mỗi đứa đều sẽ trở thành phiên bản mà mình mong muốn, nhưng vẫn luôn giữ được sự tử tế, chân thành và những điều đáng quý của riêng mình.",
+    "Sau này, khi nhìn lại những năm tháng đại học, hy vọng chúng m sẽ có thật nhiều chuyện vui để kể, thật nhiều kỷ niệm để nhớ và thật nhiều người để cảm thấy may mắn vì đã gặp được.",
+    "T cũng mong một ngày không xa, chúng m sẽ đồng hành cùng nhau ở một nơi nào đó, với tư cách là những người đồng nghiệp, chắc chắn là Big4 rồi. Chúc cho những nỗ lực hiện tại của mỗi đứa đều sẽ có một cái kết thật xứng đáng!",
+    "Chúc chúng m có một ngày 19/11 thật vui và luôn vững vàng trên con đường mình chọn. Chúc riêng Hưng sẽ có một đêm chung kết thật đáng nhớ, chúc m sẽ đạt được ước nguyện của mình. Nhớ là đừng chỉ mải mê chạy về phía trước mà quên tận hưởng những ngày tháng hiện tại nữa nhé!",
+    "Nganh,"
+  ];
+
+  let audioCtx = null;
+  let isPlayingMusic = false;
+  let musicInterval = null;
+
+  const melodyNotes = [523.25, 659.25, 783.99, 987.77, 1046.50, 987.77, 783.99, 659.25, 587.33, 739.99, 880.00, 739.99];
+  let noteStep = 0;
+
+  function playMusicBoxNote(freq) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.045, audioCtx.currentTime + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.4);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1.45);
+  }
+
+  function startMusic() {
+    if (isPlayingMusic) return;
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    isPlayingMusic = true;
+    document.getElementById('musicBtn').classList.add('playing');
+    document.getElementById('musicLabel').textContent = 'Music: On';
+
+    playMusicBoxNote(melodyNotes[noteStep % melodyNotes.length]);
+    noteStep++;
+    musicInterval = setInterval(() => {
+      if (!isPlayingMusic) return;
+      playMusicBoxNote(melodyNotes[noteStep % melodyNotes.length]);
+      noteStep++;
+    }, 680);
+  }
+
+  function stopMusic() {
+    isPlayingMusic = false;
+    clearInterval(musicInterval);
+    document.getElementById('musicBtn').classList.remove('playing');
+    document.getElementById('musicLabel').textContent = 'Music: Off';
+  }
+
+  document.getElementById('musicBtn').addEventListener('click', () => {
+    if (isPlayingMusic) stopMusic();
+    else startMusic();
+  });
+
+  const canvas = document.getElementById('fx-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function burstParticles(x, y, count = 38) {
+    const colors = ['#c5a059', '#8da185', '#e8d5a7', '#355b45', '#d99b8c'];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 5.5;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 2.5,
+        size: 4 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1,
+        rot: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 8,
+        isLeaf: Math.random() > 0.45
+      });
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.08;
+      p.vx *= 0.985;
+      p.alpha -= 0.012;
+      p.rot += p.vRot;
+
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+
+      if (p.isLeaf) {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  const coverStage = document.getElementById('coverStage');
+  const scrapbookWorld = document.getElementById('scrapbookWorld');
+  const envelope = document.getElementById('envelope');
+  const openBtn = document.getElementById('openBtn');
+  const instantBtn = document.getElementById('instantBtn');
+  const letterContent = document.getElementById('letterContent');
+  const salutation = document.getElementById('salutation');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const toName = urlParams.get('to');
+  if (toName && toName.trim()) {
+    salutation.textContent = `Dear ${toName.trim()},`;
+  }
+
+  const penNode = document.createElement('span');
+  penNode.className = 'fountain-pen';
+  penNode.innerHTML = `
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 25L5.2 19.5L19.8 4.9C20.9 3.8 22.7 3.8 23.8 4.9C24.9 6 24.9 7.8 23.8 8.9L9.2 23.5L3 25Z" fill="#243e2f" stroke="#c5a059" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M17.5 7.2L21.5 11.2" stroke="#c5a059" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M3 25L7.2 23.4L5.3 21.5L3 25Z" fill="#c5a059"/>
+    </svg>
+  `;
+
+  let writeTimeout = null;
+  let openingLock = false;
+
+  function showFullLetterInstantly() {
+    clearTimeout(writeTimeout);
+    letterContent.innerHTML = '';
+    letterParagraphs.forEach((text, idx) => {
+      const p = document.createElement('p');
+      if (idx === letterParagraphs.length - 1) p.className = 'signature-line';
+      p.textContent = text;
+      letterContent.appendChild(p);
+    });
+    instantBtn.classList.add('hidden');
+  }
+
+  function startInkWriting() {
+    clearTimeout(writeTimeout);
+    letterContent.innerHTML = '';
+    instantBtn.classList.remove('hidden');
+
+    let pIdx = 0;
+    let cIdx = 0;
+    let currentP = null;
+
+    function step() {
+      if (pIdx >= letterParagraphs.length) {
+        if (penNode.parentNode) penNode.parentNode.removeChild(penNode);
+        instantBtn.classList.add('hidden');
+        return;
+      }
+
+      if (cIdx === 0) {
+        currentP = document.createElement('p');
+        if (pIdx === letterParagraphs.length - 1) currentP.className = 'signature-line';
+        letterContent.appendChild(currentP);
+      }
+
+      const str = letterParagraphs[pIdx];
+      const charSpan = document.createElement('span');
+      charSpan.className = 'ink-char';
+      charSpan.textContent = str[cIdx];
+
+      if (penNode.parentNode === currentP) {
+        currentP.insertBefore(charSpan, penNode);
+      } else {
+        currentP.appendChild(charSpan);
+        currentP.appendChild(penNode);
+      }
+
+      cIdx++;
+
+      if (cIdx < str.length) {
+        const ch = str[cIdx - 1];
+        let speed = 20;
+        if (ch === ',' || ch === ';') speed = 130;
+        else if (ch === '.' || ch === '!') speed = 240;
+        writeTimeout = setTimeout(step, speed);
+      } else {
+        pIdx++;
+        cIdx = 0;
+        writeTimeout = setTimeout(step, 300);
+      }
+    }
+
+    step();
+  }
+
+  function handleOpenEnvelope() {
+    if (openingLock) return;
+    openingLock = true;
+
+    const rect = envelope.getBoundingClientRect();
+    burstParticles(rect.left + rect.width / 2, rect.top + rect.height * 0.56, 45);
+    startMusic();
+
+    envelope.classList.add('is-open');
+    openBtn.textContent = 'Đang mở thiệp...';
+
+    setTimeout(() => {
+      coverStage.classList.add('hide');
+    }, 950);
+
+    setTimeout(() => {
+      coverStage.classList.add('gone');
+      scrapbookWorld.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      openingLock = false;
+      startInkWriting();
+    }, 1650);
+  }
+
+  envelope.addEventListener('click', handleOpenEnvelope);
+  openBtn.addEventListener('click', handleOpenEnvelope);
+  instantBtn.addEventListener('click', showFullLetterInstantly);
+
+  document.getElementById('foldBtn').addEventListener('click', () => {
+    clearTimeout(writeTimeout);
+    scrapbookWorld.classList.remove('active');
+    coverStage.classList.remove('gone');
+    void coverStage.offsetWidth;
+    coverStage.classList.remove('hide');
+    envelope.classList.remove('is-open');
+    openBtn.textContent = 'Bóc tem mở thư ✦';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  const wishes = [
+    "Chúc chúng m rực rỡ theo cách riêng của mình! ✨",
+    "Hẹn gặp nhau ở Big4 một ngày không xa nhé! 🍀",
+    "Chúc Hưng cháy hết mình và rinh giải đêm chung kết! 🏆",
+    "Luôn bình an, vững vàng và thật nhiều niềm vui nha! 💚"
+  ];
+  let wishIndex = 0;
+
+  document.getElementById('celebrateBtn').addEventListener('click', (e) => {
+    const rect = e.target.getBoundingClientRect();
+    burstParticles(rect.left + rect.width / 2, rect.top, 60);
+    const toast = document.getElementById('toastWish');
+    toast.textContent = wishes[wishIndex % wishes.length];
+    wishIndex++;
+    toast.classList.add('show');
+  });
+
+  const lightbox = document.getElementById('lightbox');
+  const lbContent = document.getElementById('lbContent');
+  const lbCaption = document.getElementById('lbCaption');
+
+  document.querySelectorAll('.polaroid-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const img = card.querySelector('img');
+      if (img) {
+        lbContent.innerHTML = `<img src="${img.src}" alt="">`;
+      } else {
+        lbContent.textContent = card.dataset.symbol || '✿';
+      }
+      lbCaption.textContent = card.dataset.caption || '';
+      lightbox.classList.add('open');
+    });
+  });
+
+  lightbox.addEventListener('click', () => {
+    lightbox.classList.remove('open');
+  });
+</script>
+</body>
+</html>
